@@ -28,6 +28,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication()
+/**
+ * 扫描NettyHttpHandler上的注解
+ */
 @ComponentScan(includeFilters = @ComponentScan.Filter(NettyHttpHandler.class))
 
 public class HttpServerApplication {

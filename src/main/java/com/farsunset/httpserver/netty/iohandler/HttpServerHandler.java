@@ -1,24 +1,4 @@
-/**
- * Copyright 2013-2033 Xia Jun(3979434@qq.com).
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- ***************************************************************************************
- *                                                                                     *
- *                        Website : http://www.farsunset.com                           *
- *                                                                                     *
- ***************************************************************************************
- */
+
 package com.farsunset.httpserver.netty.iohandler;
 
 
@@ -56,12 +36,18 @@ import java.util.stream.Stream;
 
 @ChannelHandler.Sharable
 @Component
-public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> implements ApplicationContextAware {
+    /**
+     * 通过实现ApplicationContextAware将setApplicationContext（）函数引入spring初始化内容中去
+     */
+    public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> implements ApplicationContextAware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerHandler.class);
 
     private HashMap<Path, IFunctionHandler> functionHandlerMap = new HashMap<>();
 
+    /**
+     * 线程工厂
+     */
     private ExecutorService executor = Executors.newCachedThreadPool(runnable -> {
         Thread thread = Executors.defaultThreadFactory().newThread(runnable);
         thread.setName("NettyHttpHandler-" + thread.getName());
@@ -76,20 +62,43 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
         FullHttpRequest copyRequest = request.copy();
+        /**
+         * 通过内部类的形式传入一个runnable的实现类并重写了run方法 线程池在执行的时候会调用这个方法
+         */
         executor.execute(() -> onReceivedRequest(ctx,new NettyHttpRequest(copyRequest)));
     }
 
-
+    /**
+     *
+      * @param context
+     * @param request
+     */
     private void onReceivedRequest(ChannelHandlerContext context, NettyHttpRequest request){
+        /**
+         * 处理request请求
+         */
         FullHttpResponse response = handleHttpRequest(request);
+        /**
+         * 通过channel将结果输出 并通过添加监听器的方式关闭channel通道
+         */
         context.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+        /**
+         * 释放bytebuf缓存
+         */
         ReferenceCountUtil.release(request);
     }
 
+    /**
+     *
+     * @param request NettyHttpRequest extends Fullhttpreuqest
+     * @return 请求处理结果
+     */
     private FullHttpResponse handleHttpRequest(NettyHttpRequest request) {
 
         IFunctionHandler functionHandler = null;
-
+        /**
+         * 请求处理并根据不同的结果或者捕获的异常进行状态码转换并返回
+         */
         try {
             functionHandler = matchFunctionHandler(request);
             Response response =  functionHandler.execute(request);
@@ -107,12 +116,24 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         }
     }
 
+    /**
+     * spring初始化加载此函数
+     * @param applicationContext
+     */
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
+        /**
+         * 获得所有NettyHttpHandler的注解类
+         */
         Map<String, Object> handlers =  applicationContext.getBeansWithAnnotation(NettyHttpHandler.class);
         for (Map.Entry<String, Object> entry : handlers.entrySet()) {
             Object handler = entry.getValue();
             Path path = Path.make(handler.getClass().getAnnotation(NettyHttpHandler.class));
+            /**
+             * 查询是否当前处理器的注解是否已经存在（类似于SSM中controler的注解不能重复）
+             * 1.存在则抛出异常
+             * 2. 不存在则存入Map集合中 在SSM中是通过对类方法注解的扫描 存入内部类mapperRegistry中
+             */
             if (functionHandlerMap.containsKey(path)){
                 LOGGER.error("IFunctionHandler has duplicated :" + path.toString(),new IllegalPathDuplicatedException());
                 System.exit(0);

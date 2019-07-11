@@ -1,9 +1,9 @@
+package com.action.controller;
 
-package com.farsunset.httpserver.netty.handler;
 import com.farsunset.httpserver.dto.Response;
 import com.farsunset.httpserver.netty.annotation.NettyHttpHandler;
+import com.farsunset.httpserver.netty.handler.IFunctionHandler;
 import com.farsunset.httpserver.netty.http.NettyHttpRequest;
-
 
 @NettyHttpHandler(path = "/request/body",method = "POST")
 public class RequestBodyHandler implements IFunctionHandler<String> {

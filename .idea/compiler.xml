@@ -6,13 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="netty.http.server" />
         <module name="NettyHttpServer" />
       </profile>
     </annotationProcessing>
-  </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="NettyHttpServer" options="-parameters" />
-    </option>
+    <bytecodeTargetLevel>
+      <module name="netty.http.server" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

@@ -1,24 +1,4 @@
-/**
- * Copyright 2013-2033 Xia Jun(3979434@qq.com).
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- ***************************************************************************************
- *                                                                                     *
- *                        Website : http://www.farsunset.com                           *
- *                                                                                     *
- ***************************************************************************************
- */
+
 package com.farsunset.httpserver.netty.http;
 
 import io.netty.buffer.ByteBuf;
@@ -33,7 +13,9 @@ import static io.netty.handler.codec.http.HttpHeaderNames.*;
 public class NettyHttpResponse extends DefaultFullHttpResponse {
 
     private static final PooledByteBufAllocator BYTE_BUF_ALLOCATOR = new PooledByteBufAllocator(false);
-
+    /**
+     * 状态码设置
+     */
     private static final String CONTENT_NORMAL_200 = "{\"code\":200,\"message\":\"OK\"}";
     private static final String CONTENT_ERROR_401 = "{\"code\":401,\"message\":\"UNAUTHORIZED\"}";
     private static final String CONTENT_ERROR_404 = "{\"code\":404,\"message\":\"REQUEST PATH NOT FOUND\"}";

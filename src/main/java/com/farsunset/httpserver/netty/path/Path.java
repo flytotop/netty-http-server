@@ -36,7 +36,7 @@ public class Path {
         method = annotation.method();
         uri = annotation.path();
         equal = annotation.equal();
-    }
+}
     public String getMethod() {
         return method;
     }
